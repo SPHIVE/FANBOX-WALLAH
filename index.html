@@ -10,6 +10,7 @@
 
 <div class="landingpage">
 
+
   <!-- NAVBAR -->
   <div class="navbar">
     <a class="navlogo">FANBOX WALLAH</a>
@@ -21,11 +22,17 @@
 <a href="contact.html" class="navlink">Contact</a>
     </div>
 
+<button onclick="logout()" style="padding:8px 15px; border:none; border-radius:8px; background:#00ffcc; cursor:pointer;">
+  Logout
+</button>
+    
 
  <a href="login.html">
   <button class="createbtn">LOGIN</button>
 </a>
   </div>
+
+  
 
   <!-- HERO -->
   <div class="box">
@@ -44,6 +51,7 @@
         <button class="infobox-createbtn">Contact Us</button>
       </div>
     </div>
+    
 
     <div class="display">
       <img class="display-nft" src="ceilling fan.jpg">
@@ -192,10 +200,50 @@
   </div>
 
 </div>
+
+<script>
+  auth.onAuthStateChanged(user => {
+  if(!user){
+    window.location.href = "login.html";
+  }
+});
+</script>
     
+
+<script>
+function logout(){
+  auth.signOut().then(() => {
+    alert("Logged out successfully ✅");
+    window.location.href = "login.html";
+  }).catch((error) => {
+    alert("Error: " + error.message);
+  });
+}
+</script>
 
 
 
 
 </body>
+
+
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDGYdK47Pl3c1ToOEJYNyxxa1SPG3dWEZM",
+  authDomain: "fanbox-wallah.firebaseapp.com",
+  projectId: "fanbox-wallah",
+  appId: "1:679803386087:web:4ac97267c5a413f762ca42"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+</script>
+
+
+
+
 </html>

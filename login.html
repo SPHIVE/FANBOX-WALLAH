@@ -1,95 +1,132 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Login - Fanbox Wallah</title>
+<title>Fanbox Wallah - Auth</title>
 
-  <style>
-  *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial;
-  }
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial;
+}
 
-  body{
-    height:100vh;
-    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1c92d2);
-    background-size: 400% 400%;
-    animation: gradientBG 10s ease infinite;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    color:white;
-  }
+body{
+  height:100vh;
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
 
-  @keyframes gradientBG {
-    0% {background-position: 0% 50%;}
-    50% {background-position: 100% 50%;}
-    100% {background-position: 0% 50%;}
-  }
+/* Glass Card */
+.glass{
+  backdrop-filter: blur(15px);
+  background: rgba(255,255,255,0.1);
+  border-radius:20px;
+  padding:30px;
+  width:320px;
+  text-align:center;
+  color:white;
+  box-shadow:0 0 30px rgba(0,0,0,0.4);
+  border:1px solid rgba(255,255,255,0.2);
+  animation: fadeIn 1s ease;
+}
 
-  .box{
-    background:#1e2a38;
-    padding:30px;
-    border-radius:15px;
-    width:300px;
-    text-align:center;
-    box-shadow:0 0 20px rgba(0,0,0,0.5);
-  }
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(30px);}
+  to{opacity:1; transform:translateY(0);}
+}
 
-  h2{
-    margin-bottom:20px;
-  }
+h2{
+  margin-bottom:20px;
+}
 
-  input{
-    width:100%;
-    padding:10px;
-    margin:10px 0;
-    border:none;
-    border-radius:8px;
-  }
+/* Inputs */
+input{
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+  border:none;
+  border-radius:10px;
+  outline:none;
+}
 
-  button{
-    width:100%;
-    padding:10px;
-    margin-top:10px;
-    border:none;
-    border-radius:8px;
-    background:#00ffcc;
-    cursor:pointer;
-    font-weight:bold;
-  }
+/* Buttons */
+button{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  background:#00ffcc;
+  cursor:pointer;
+  font-weight:bold;
+}
 
-  button:hover{
-    background:#00ccaa;
-  }
+button:hover{
+  background:#00ccaa;
+}
 
-  #error{
-    color:red;
-    margin-top:10px;
-  }
+/* Logout button */
+.logout-btn{
+  background:#ff4d4d;
+}
 
-  </style>
+.logout-btn:hover{
+  background:#cc0000;
+}
+
+/* Close button */
+.close{
+  position:absolute;
+  right:20px;
+  top:10px;
+  font-size:22px;
+  cursor:pointer;
+}
+
+/* Hidden */
+.hidden{
+  display:none;
+}
+
+#error{
+  color:#ff8080;
+  margin-top:10px;
+}
+</style>
 
 </head>
 
 <body>
 
-<div class="box">
+<div class="glass">
 
-  <h2>Fanbox Wallah 🔐</h2>
+  <span class="close" onclick="closePage()">&times;</span>
+
+  <h2 id="title">Login 🔐</h2>
 
   <input type="email" id="email" placeholder="Enter Email">
   <input type="password" id="password" placeholder="Enter Password">
 
-  <button onclick="login()">Login</button>
-  <button onclick="signup()">Create Account</button>
+  <!-- Auth Buttons -->
+  <div id="authButtons">
+    <button onclick="login()">Login</button>
+    <button onclick="signup()">Sign Up</button>
+  </div>
+
+  <!-- Logout Section -->
+  <div id="logoutSection" class="hidden">
+    <p id="welcome"></p>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
 
   <p id="error"></p>
 
 </div>
 
-<!-- Firebase CDN -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
@@ -105,43 +142,58 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
 
-// SIGNUP
-function signup(){
-  let email = document.getElementById("email").value;
-  let password = document.getElementById("password").value;
-
-  auth.createUserWithEmailAndPassword(email, password)
-  .then(() => {
-    alert("Account Created ✅");
-  })
-  .catch((error) => {
-    document.getElementById("error").innerText = error.message;
-  });
-}
-
-
 // LOGIN
 function login(){
   let email = document.getElementById("email").value;
   let password = document.getElementById("password").value;
 
   auth.signInWithEmailAndPassword(email, password)
-  .then(() => {
-    alert("Login Successful 🔥");
-    window.location.href = "index.html";
-  })
-  .catch((error) => {
-    document.getElementById("error").innerText = error.message;
+  .catch(err=>{
+    document.getElementById("error").innerText = err.message;
   });
 }
 
 
-// AUTO LOGIN CHECK
+// SIGNUP
+function signup(){
+  let email = document.getElementById("email").value;
+  let password = document.getElementById("password").value;
+
+  auth.createUserWithEmailAndPassword(email, password)
+  .catch(err=>{
+    document.getElementById("error").innerText = err.message;
+  });
+}
+
+
+// LOGOUT
+function logout(){
+  auth.signOut();
+}
+
+
+// STATE CHANGE (MAIN MAGIC 🔥)
 auth.onAuthStateChanged(user => {
   if(user){
-    window.location.href = "index.html";
+    document.getElementById("authButtons").classList.add("hidden");
+    document.getElementById("logoutSection").classList.remove("hidden");
+
+    document.getElementById("welcome").innerText = "Welcome 👋 " + user.email;
+    document.getElementById("title").innerText = "Dashboard";
+  } else {
+    document.getElementById("authButtons").classList.remove("hidden");
+    document.getElementById("logoutSection").classList.add("hidden");
+
+    document.getElementById("title").innerText = "Login 🔐";
   }
 });
+
+
+// CLOSE PAGE (optional)
+function closePage(){
+  window.location.href = "index.html";
+}
+
 </script>
 
 </body>
