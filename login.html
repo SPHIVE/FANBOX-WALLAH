@@ -1,52 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Fanbox Wallah - Auth</title>
+<meta charset="UTF-8">
+<title>Fanbox Wallah - Login</title>
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Arial;
-}
-
 body{
+  margin:0;
   height:100vh;
-  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
   display:flex;
   justify-content:center;
   align-items:center;
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  font-family:Arial;
 }
 
-/* Glass Card */
-.glass{
-  backdrop-filter: blur(15px);
-  background: rgba(255,255,255,0.1);
+/* Glass box */
+.card{
+  width:350px;
+  padding:25px;
   border-radius:20px;
-  padding:30px;
-  width:320px;
-  text-align:center;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(15px);
   color:white;
-  box-shadow:0 0 30px rgba(0,0,0,0.4);
-  border:1px solid rgba(255,255,255,0.2);
-  animation: fadeIn 1s ease;
+  box-shadow:0 0 25px rgba(0,0,0,0.4);
+  text-align:center;
 }
 
-@keyframes fadeIn{
-  from{opacity:0; transform:translateY(30px);}
-  to{opacity:1; transform:translateY(0);}
+h2{ margin-bottom:15px; }
+
+/* Tabs */
+.tab{
+  display:flex;
+  margin-bottom:15px;
+  border-radius:10px;
+  overflow:hidden;
 }
 
-h2{
-  margin-bottom:20px;
+.tab button{
+  flex:1;
+  padding:10px;
+  border:none;
+  cursor:pointer;
+  background:#ffffff22;
+  color:white;
+}
+
+.tab button.active{
+  background:#00ffcc;
+  color:black;
 }
 
 /* Inputs */
 input{
   width:100%;
   padding:10px;
-  margin:10px 0;
+  margin:8px 0;
   border:none;
   border-radius:10px;
   outline:none;
@@ -56,77 +65,68 @@ input{
 button{
   width:100%;
   padding:10px;
-  margin-top:10px;
+  margin-top:8px;
   border:none;
   border-radius:10px;
-  background:#00ffcc;
   cursor:pointer;
   font-weight:bold;
 }
 
-button:hover{
+.primary{
+  background:#00ffcc;
+}
+
+.primary:hover{
   background:#00ccaa;
 }
 
-/* Logout button */
-.logout-btn{
+.small{
   background:#ff4d4d;
+  color:white;
 }
 
-.logout-btn:hover{
-  background:#cc0000;
-}
+#otpBox{ display:none; }
 
-/* Close button */
-.close{
-  position:absolute;
-  right:20px;
-  top:10px;
-  font-size:22px;
-  cursor:pointer;
-}
-
-/* Hidden */
-.hidden{
-  display:none;
-}
-
-#error{
-  color:#ff8080;
-  margin-top:10px;
-}
 </style>
-
 </head>
 
 <body>
 
-<div class="glass">
+<div class="card">
 
-  <span class="close" onclick="closePage()">&times;</span>
+<h2>Fanbox Login 🔐</h2>
 
-  <h2 id="title">Login 🔐</h2>
+<!-- TAB -->
+<div class="tab">
+  <button class="active" onclick="showEmail()">Email</button>
+  <button onclick="showPhone()">Phone</button>
+</div>
 
+<!-- EMAIL LOGIN -->
+<div id="emailBox">
   <input type="email" id="email" placeholder="Enter Email">
   <input type="password" id="password" placeholder="Enter Password">
 
-  <!-- Auth Buttons -->
-  <div id="authButtons">
-    <button onclick="login()">Login</button>
-    <button onclick="signup()">Sign Up</button>
+  <button class="primary" onclick="loginEmail()">Login</button>
+  <button class="small" onclick="signupEmail()">Sign Up</button>
+</div>
+
+<!-- PHONE LOGIN -->
+<div id="phoneBox" style="display:none;">
+  <input type="text" id="phone" placeholder="+91XXXXXXXXXX">
+  <button class="primary" onclick="sendOTP()">Send OTP</button>
+
+  <div id="otpBox">
+    <input type="text" id="otp" placeholder="Enter OTP">
+    <button class="primary" onclick="verifyOTP()">Verify OTP</button>
   </div>
 
-  <!-- Logout Section -->
-  <div id="logoutSection" class="hidden">
-    <p id="welcome"></p>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-  </div>
-
-  <p id="error"></p>
+  <div id="recaptcha-container"></div>
+</div>
 
 </div>
 
-<!-- Firebase -->
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
@@ -141,57 +141,64 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
+let confirmationResult;
 
-// LOGIN
-function login(){
-  let email = document.getElementById("email").value;
-  let password = document.getElementById("password").value;
+/* SWITCH UI */
+function showEmail(){
+  document.getElementById("emailBox").style.display="block";
+  document.getElementById("phoneBox").style.display="none";
+}
 
-  auth.signInWithEmailAndPassword(email, password)
-  .catch(err=>{
-    document.getElementById("error").innerText = err.message;
+function showPhone(){
+  document.getElementById("emailBox").style.display="none";
+  document.getElementById("phoneBox").style.display="block";
+}
+
+/* EMAIL LOGIN */
+function loginEmail(){
+  auth.signInWithEmailAndPassword(
+    email.value,
+    password.value
+  ).then(()=>{
+    alert("Login Success ✅");
+    window.location.href="index.html";
+  }).catch(e=>alert(e.message));
+}
+
+/* SIGNUP */
+function signupEmail(){
+  auth.createUserWithEmailAndPassword(
+    email.value,
+    password.value
+  ).then(()=>{
+    alert("Account Created ✅");
+  }).catch(e=>alert(e.message));
+}
+
+/* PHONE OTP */
+function sendOTP(){
+  let number = document.getElementById("phone").value;
+
+  let appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container',{
+    size:'invisible'
   });
+
+  auth.signInWithPhoneNumber(number, appVerifier)
+  .then(result=>{
+    confirmationResult = result;
+    document.getElementById("otpBox").style.display="block";
+    alert("OTP Sent 📩");
+  })
+  .catch(e=>alert(e.message));
 }
 
-
-// SIGNUP
-function signup(){
-  let email = document.getElementById("email").value;
-  let password = document.getElementById("password").value;
-
-  auth.createUserWithEmailAndPassword(email, password)
-  .catch(err=>{
-    document.getElementById("error").innerText = err.message;
-  });
-}
-
-
-// LOGOUT
-function logout(){
-  auth.signOut();
-}
-
-
-// STATE CHANGE (MAIN MAGIC 🔥)
-auth.onAuthStateChanged(user => {
-  if(user){
-    document.getElementById("authButtons").classList.add("hidden");
-    document.getElementById("logoutSection").classList.remove("hidden");
-
-    document.getElementById("welcome").innerText = "Welcome 👋 " + user.email;
-    document.getElementById("title").innerText = "Dashboard";
-  } else {
-    document.getElementById("authButtons").classList.remove("hidden");
-    document.getElementById("logoutSection").classList.add("hidden");
-
-    document.getElementById("title").innerText = "Login 🔐";
-  }
-});
-
-
-// CLOSE PAGE (optional)
-function closePage(){
-  window.location.href = "index.html";
+function verifyOTP(){
+  confirmationResult.confirm(otp.value)
+  .then(()=>{
+    alert("Login Success ✅");
+    window.location.href="index.html";
+  })
+  .catch(()=>alert("Wrong OTP ❌"));
 }
 
 </script>
